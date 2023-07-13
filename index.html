@@ -5,9 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pangolin&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"></head>
 <body>
-    
+    <div class="site-container">
+        <div class="game-container">
+            <header class="header">
+                <div class="container max-width">
+                    <button id="homeButton" class="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Return to Home Screen</title><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg>
+                    </button>
+                    <h2>Tic-Tac-Toe</h2>
+                    <button id="resetButton" class="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Reset Game</title><path d="M12,6V9L16,5L12,1V4A8,8 0 0,0 4,12C4,13.57 4.46,15.03 5.24,16.26L6.7,14.8C6.25,13.97 6,13 6,12A6,6 0 0,1 12,6M18.76,7.74L17.3,9.2C17.74,10.04 18,11 18,12A6,6 0 0,1 12,18V15L8,19L12,23V20A8,8 0 0,0 20,12C20,10.43 19.54,8.97 18.76,7.74Z" /></svg>
+                    </button>
+                </div>
+            </header>
+            <main class="main">
+                <div class="container max-width">
+                    <div class="main-top">
+                        <p>Player One's turn</p>
+                    </div>
+                    <div class="board-container">
+                        <div class="board">
+                            <button class="cell one" data-row="0" data-column="0"><span></span></button>
+                            <button class="cell one" data-row="0" data-column="1"><span></span></button>
+                            <button class="cell one" data-row="0" data-column="2"><span></span></button>
+                            <button class="cell two" data-row="1" data-column="0"><span></span></button>
+                            <button class="cell two" data-row="1" data-column="1"><span></span></button>
+                            <button class="cell two" data-row="1" data-column="2"><span></span></button>
+                            <button class="cell two" data-row="2" data-column="0"><span></span></button>
+                            <button class="cell one" data-row="2" data-column="1"><span></span></button>
+                            <button class="cell one" data-row="2" data-column="2"><span></span></button>
+                        </div>
+                    </div>
+                    <div class="main-bot">
+                        <div class="player-container">
+                            <p id="player1Name">Player One</p>
+                            <p id="player1Score">0</p>
+                        </div>
+                        <div class="player-container">
+                            <p id="player2Name">Player Two</p>
+                            <p id="player2Score">0</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
 </body>
 <script src="script.js"></script>
 </html>

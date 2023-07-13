@@ -1,0 +1,152 @@
+:root {
+    --color-accent: #B2A4FF;
+    --color-accent-light: #FFB4B4;
+    --color-accent-lighter: #FFDEB4;
+    --color-accent-lightest: #FDF7C3;
+}
+
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+    font-family: 'Pangolin', cursive;
+}
+
+html, body,
+h1, h2, h3, h4, h5, h6,
+p, button {
+    margin: 0;
+    padding: 0;
+}
+
+.max-width {
+    max-width: min(calc(100vw), 60vh);
+    margin: 0 auto;
+}
+
+.site-container {
+    /* background-color: var(--color-accent); */
+    height: 100vh;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    background-color: var(--color-accent);
+    height: 8vh;
+    color: #fff;
+}
+
+.header > .container {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h2 {
+    font-size: 4vh;
+}
+
+.button {
+    height: 6vh;
+    width: 6vh;
+    background: none;
+    border: none;
+    margin: 1vh;
+}
+
+.button svg {
+    fill: #fff;
+}
+
+.main {
+    flex: 1;
+    background-color: var(--color-accent-lightest);
+    color: var(--color-accent-light);
+    font-weight: 600;
+}
+
+.main > .container {
+    height: 100%;
+    display: grid;
+    justify-content: center;
+    grid-template-rows: 1fr auto 1.25fr;
+}
+
+.main-top {
+    justify-self: center;
+    align-self: end;
+    margin: 5vh 0 1vh 0;
+}
+
+.main-top > p {
+    font-size: 6vh;
+}
+
+.board-container {
+    position: relative;
+    width: min(calc(100vw), 60vh);
+}
+
+.board-container::before {
+    display: block;
+    content: "";
+    padding-top: 100%;
+}
+
+.board {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--color-accent-lighter);
+    padding: 1vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1vh;
+}
+
+.cell {
+    font-family: 'Pangolin', cursive;
+    background-color: white;
+    color: var(--color-accent-light);
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 0;
+    font-size: min(20vh, 30vw);
+}
+
+.cell:hover span::before {
+    opacity: 0.25;
+
+}
+
+.cell.one:hover span::before {
+    content: 'o';
+}
+
+.cell.two:hover span::before {
+    content: 'x';
+}
+
+.main-bot {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: min(4vh, 6vw) min(2vh, 3vw);
+    justify-content: space-between;
+}
+
+.main-bot > .player-container:last-child {
+    text-align: end;
+}
+
+.main-bot p {
+    font-size: 3vh;
+}
