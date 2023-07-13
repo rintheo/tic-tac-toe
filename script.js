@@ -143,6 +143,7 @@ const game = (() => {
     const _screenController = (() => {
         const mainTop = document.querySelector('.main-top>p');
         const board = document.querySelector('.board');
+        const playAgainButton = document.querySelector('#playAgainButton');
 
         const displayActivePlayer = () => {
             mainTop.textContent = `${_activePlayer.name}'s turn`;
@@ -156,13 +157,18 @@ const game = (() => {
             mainTop.textContent = `Draw!!`;
         }
 
+        const displayPlayAgain = () => {
+            playAgainButton.classList.remove('visibility-hidden');
+        }
+
         const clickBoard = (e) => {
             if (playRound(e.target.dataset.row, e.target.dataset.column)) {
                 displayActivePlayer();
                 clearBoard();
                 generateBoard();
                 if (_gameOver) {
-                    (_winningPlayer !== '') ? displayWinningPlayer() : displayDraw() ;
+                    (_winningPlayer !== '') ? displayWinningPlayer() : displayDraw();
+                    displayPlayAgain();
                 }
                 // animateCell(e.target.dataset.row, e.target.dataset.column);
             }
@@ -193,6 +199,15 @@ const game = (() => {
                 }           
             }
         }
+
+        const clickPlayAgain = () => {
+            resetGame();
+            displayActivePlayer();
+            clearBoard();
+            generateBoard();
+            playAgainButton.classList.add('visibility-hidden');
+        }
+        playAgainButton.addEventListener('click', clickPlayAgain);
         
         // Initialize for the first game
         displayActivePlayer();
