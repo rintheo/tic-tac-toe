@@ -1,5 +1,6 @@
 :root {
     --color-accent: #B2A4FF;
+    --color-accent-light-transparent: rgb(255, 180, 180, 0.25);
     --color-accent-light: #FFB4B4;
     --color-accent-lighter: #FFDEB4;
     --color-accent-lightest: #FDF7C3;
@@ -121,20 +122,24 @@ p, button {
     align-items: center;
     line-height: 0;
     font-size: min(20vh, 30vw);
+    transition: 0.1s;
 }
 
-.cell:hover span::before {
-    opacity: 0.25;
-
+.cell:hover::before {
+    color: var(--color-accent-light-transparent);
 }
 
-.cell.one:hover span::before {
+.cell.one:hover::before {
     content: 'o';
 }
 
-.cell.two:hover span::before {
+.cell.two:hover::before {
     content: 'x';
 }
+
+/* .cell.clicked {
+    background-color: var(--color-accent-lightest);
+} */
 
 .main-bot {
     display: grid;
