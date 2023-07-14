@@ -30,7 +30,7 @@ a {
 }
 
 .max-width {
-    max-width: min(calc(100vw), 60vh);
+    max-width: min(calc(100vw), 100vh);
     margin: 0 auto;
 }
 
