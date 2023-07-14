@@ -38,10 +38,12 @@ const game = (() => {
         {
             name: 'Player One',
             mark: 'o',
+            score: 0,
         },
         {
             name: 'Player Two',
-            mark: 'x'
+            mark: 'x',
+            score: 0,
         },
     ];
 
@@ -64,6 +66,7 @@ const game = (() => {
 
         if (_checkForWinner()) {
             _gameOver = true;
+            _winningPlayer.score += 1;
             console.log(`Winner is ${_winningPlayer.name}!`);
             return true;
         }      
@@ -134,7 +137,7 @@ const game = (() => {
         }
     }
 
-    const resetGame = () => {
+    const restartGame = () => {
         _gameOver = false;
         _winningPlayer = '';
         _gameBoard.resetBoard();
@@ -144,8 +147,12 @@ const game = (() => {
         const mainTop = document.querySelector('.main-top>p');
         const board = document.querySelector('.board');
         const playAgainButton = document.querySelector('#playAgainButton');
+        const resetButton = document.querySelector('#resetButton');
+        const player1Score = document.querySelector('#player1Score');
+        const player2Score = document.querySelector('#player2Score');
 
         const displayActivePlayer = () => {
+
             mainTop.textContent = `${_activePlayer.name}'s turn`;
         }
 
@@ -161,11 +168,21 @@ const game = (() => {
             playAgainButton.classList.remove('visibility-hidden');
         }
 
+        const displayPlayerScores = () => {
+            player1Score.textContent = _players[0].score;
+            player2Score.textContent = _players[1].score;
+        }
+
+        const refreshScreen = () => {
+            displayActivePlayer();
+            clearBoard();
+            generateBoard();
+            displayPlayerScores();
+        }
+
         const clickBoard = (e) => {
             if (playRound(e.target.dataset.row, e.target.dataset.column)) {
-                displayActivePlayer();
-                clearBoard();
-                generateBoard();
+                refreshScreen();
                 if (_gameOver) {
                     (_winningPlayer !== '') ? displayWinningPlayer() : displayDraw();
                     displayPlayAgain();
@@ -176,7 +193,7 @@ const game = (() => {
 
         // const animateCell = (row, column) => {
         //     const clickedCell = document.querySelector(`[data-row='${row}'][data-column='${column}']`)
-        //     clickedCell.classList.add('clicked');
+        //     clickedCell.classList.add('clicksed');
         // }
 
         const clearBoard = () => {
@@ -200,14 +217,20 @@ const game = (() => {
             }
         }
 
-        const clickPlayAgain = () => {
-            resetGame();
-            displayActivePlayer();
-            clearBoard();
-            generateBoard();
+        const playAgain = () => {
+            restartGame();
+            refreshScreen();
             playAgainButton.classList.add('visibility-hidden');
         }
-        playAgainButton.addEventListener('click', clickPlayAgain);
+        playAgainButton.addEventListener('click', playAgain);
+
+        const resetGame = () => {
+            _players[0].score = 0;
+            _players[1].score = 0;
+            _activePlayer = _players[0];
+            playAgain();
+        }
+        resetButton.addEventListener('click', resetGame);
         
         // Initialize for the first game
         displayActivePlayer();
@@ -217,6 +240,6 @@ const game = (() => {
 
     return {
         playRound, // Can be removed later
-        resetGame,
+        restartGame,
     }
 })();
