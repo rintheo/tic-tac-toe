@@ -3,6 +3,8 @@
     --color-accent-hover: #a89bf2;
     --color-accent-active: #9d90e6;
     --color-accent-light: #ffb4b4;
+    --color-accent-light-hover: #f6abab;
+    --color-accent-light-active: #f0a3a3;
     --color-accent-lighter: #ffdeb4;
     --color-accent-lightest: #fdf7c3;
 }
@@ -22,6 +24,11 @@ p, button {
     padding: 0;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .max-width {
     max-width: min(calc(100vw), 60vh);
     margin: 0 auto;
@@ -32,8 +39,102 @@ p, button {
 }
 
 .site-container {
-    /* background-color: var(--color-accent); */
+    position: relative;
     height: 100vh;
+}
+
+.title-screen {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 100%;
+    background-color: var(--color-accent);
+    color: white;
+    font-size: 4vh;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0s ease 0s;
+}
+
+.title-screen.visibility-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0s ease 0.5s;
+}
+
+.title {
+    margin-top: 25vh;
+}
+
+.title + .container {
+    position: relative;
+    margin-bottom: 25vh;
+    width: 30vh;
+    height: 20vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#playButton,
+.vs {
+    position: absolute;
+}
+
+.vs {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vh;
+    width: 100%;
+}
+
+.title-screen button {
+    grid-column: 1 / -1;
+    justify-self: center;
+    font-size: 4vh;
+    padding: 1vh 3vh;
+    height: 7.5vh;
+    width: 100%;
+    background-color: var(--color-accent-light);
+    color: #fff;
+    border-radius: 3vh;
+    border: none;
+}
+
+.title-screen button:hover {
+    background-color: var(--color-accent-light-hover);
+}
+
+.title-screen button:active {
+    background-color: var(--color-accent-light-active);
+}
+
+.footer {
+    /* padding: 0.5rem; */
+    color: white;
+    text-align: center;
+    font-size: 1.5vh;
+    margin-bottom: 2.5vh;
+}
+
+.svg-icon {
+    display: inline-block;
+    vertical-align: bottom;
+    fill: currentColor;
+    height: 3vh;
+}
+
+.copyright {
+    line-height: 3vh;
+}
+
+.copyright svg:hover {
+    transition: 0.15s;
+    fill: lightgrey;
 }
 
 .game-container {
@@ -65,11 +166,11 @@ p, button {
     background: none;
     border-radius: 50%;
     padding: 1vh;
+    margin: 1vh;
 }
 
 .button {
     border: none;
-    margin: 1vh;
 }
 
 .button svg {
@@ -236,6 +337,7 @@ p, button {
     color: #fff;
     border-radius: 3vh;
     border: none;
+    margin: 1vh;
 }
 
 .button {

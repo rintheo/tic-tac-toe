@@ -181,7 +181,42 @@ const game = (() => {
         _gameBoard.resetBoard();
     }
 
-    const _screenController = (() => {
+    const _titleScreenController = (() => {
+        const titleScreen = document.querySelector('.title-screen');
+        const playButton = document.querySelector('#playButton');
+        const vsButtons = document.querySelector('.vs');
+        const vsPlayerButton = document.querySelector('#vsPlayerButton');
+        const vsAIButton = document.querySelector('#vsAIButton');
+        const homeButton = document.querySelector('#homeButton');
+
+        const playGame = () => {
+            playButton.classList.add('visibility-hidden');
+            playButton.addEventListener('transitionend', () => {
+                vsButtons.classList.remove('visibility-hidden');
+            }, {once: true});
+        }
+        playButton.addEventListener('click', playGame);
+        
+        const playVersusPlayer = () => {
+            titleScreen.classList.add('visibility-hidden');
+            titleScreen.addEventListener('transitionend', () => {
+                vsButtons.classList.add('visibility-hidden');
+            }, {once: true});
+        }
+        vsPlayerButton.addEventListener('click', playVersusPlayer);
+
+        const returnToTitle = () => {
+            titleScreen.classList.remove('visibility-hidden');
+            playButton.classList.remove('visibility-hidden');
+            titleScreen.addEventListener('transitionend', () => {
+                _gameScreenController.resetGame();                
+            }, {once: true});           
+        }
+        homeButton.addEventListener('click', returnToTitle);
+
+    })();
+
+    const _gameScreenController = (() => {
         const mainTop = document.querySelector('.main-top>p');
         const board = document.querySelector('.board');
         const playAgainButton = document.querySelector('#playAgainButton');
@@ -300,6 +335,9 @@ const game = (() => {
         displayActivePlayer();
         generateBoard();
 
+        return {
+            resetGame,
+        }
     })();
 
     return {
@@ -307,3 +345,7 @@ const game = (() => {
         restartGame,
     }
 })();
+
+document
+    .querySelector('#currentYear')
+    .textContent = new Date().getFullYear();
