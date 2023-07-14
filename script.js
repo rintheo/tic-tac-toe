@@ -117,6 +117,7 @@ const game = (() => {
     const _checkForWinner = () => {
         let testLines = [];
         let testLineIndex = 0;
+        let check = false;
 
         // Log each row 
         for (let i = 0; i < _gameBoard.getRowCount(); i++) {
@@ -154,15 +155,16 @@ const game = (() => {
         // Check logged testLines for winning condition
         for (testLine of testLines) {
             if (testLine.every(cell => (cell.getValue() !== '') && (cell.getValue() === testLine[0].getValue()))) {
+                _winningLine.push(testLine);
                 for (_player of _players) {
                     if (_player.mark === testLine[0].getValue()) {
-                        _winningLine = testLine;
                         _winningPlayer = _player;
-                        return true;
+                        check = true;
                     }
                 }
             }
         }
+        return check;
     }
 
     const _checkForDraw = () => {
@@ -188,7 +190,6 @@ const game = (() => {
         const player2Score = document.querySelector('#player2Score');
 
         const displayActivePlayer = () => {
-
             mainTop.textContent = `${_activePlayer.name}'s turn`;
         }
 
@@ -209,8 +210,7 @@ const game = (() => {
             player2Score.textContent = _players[1].score;
         }
 
-        const clickBoard = (e) => {
-            
+        const clickBoard = (e) => {            
             if (playRound(e.currentTarget.dataset.row, e.currentTarget.dataset.column)) {
                 refreshScreen();
                 if (_gameOver) {
@@ -268,9 +268,11 @@ const game = (() => {
         }
 
         const highlightWinningLine = () => {
-            for (cell of _winningLine) {
-                const winningCell = document.querySelector(`[data-row='${cell.getRowPosition()}'][data-column='${cell.getColumnPosition()}']`);
-                winningCell.classList.add('winner');
+            for (line of _winningLine) {
+                for (cell of line) {
+                    const winningCell = document.querySelector(`[data-row='${cell.getRowPosition()}'][data-column='${cell.getColumnPosition()}']`);
+                    winningCell.classList.add('winner');
+                }
             }
         }
 
