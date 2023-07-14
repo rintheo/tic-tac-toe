@@ -76,6 +76,13 @@ const game = (() => {
     const _switchActivePlayer = () => _activePlayer = _activePlayer === _players[0] ? _players[1] : _players[0];
     const _printActivePlayer = () => console.log(`It's ${_activePlayer.name}'s turn!`);
 
+    let _startingPlayer = _players[0];
+    const _switchStartingPlayer = () => {
+        _startingPlayer = (_startingPlayer === _players[0]) ? _players[1] : _players[0];
+        _activePlayer = _startingPlayer;
+    } 
+    const _resetStartingPlayer = () => _activePlayer = _players[0];
+
     let _winningPlayer = '';
     let _winningLine = [];
 
@@ -174,7 +181,6 @@ const game = (() => {
     }
 
     const restartGame = () => {
-        _activePlayer = _players[0];
         _gameOver = false;
         _winningLine = [];
         _winningPlayer = '';
@@ -313,11 +319,15 @@ const game = (() => {
 
         const resetGame = () => {
             _resetScores();
-            playAgain();
+            _resetStartingPlayer();
+            restartGame();
+            refreshScreen();
+            playAgainButton.classList.add('visibility-hidden');
         }
         resetButton.addEventListener('click', resetGame);
 
         const playAgain = () => {
+            _switchStartingPlayer();
             restartGame();
             refreshScreen();
             playAgainButton.classList.add('visibility-hidden');
