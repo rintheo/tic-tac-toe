@@ -212,14 +212,39 @@ const game = (() => {
         vsPlayerButton.addEventListener('click', playVersusPlayer);
 
         const returnToTitle = () => {
-            titleScreen.classList.remove('visibility-hidden');
-            playButton.classList.remove('visibility-hidden');
-            titleScreen.addEventListener('transitionend', () => {
-                _gameScreenController.resetGame();                
-            }, {once: true});           
+            _dialogBoxController.showDialog(homeButton.dataset.dialog ,() => {
+                titleScreen.classList.remove('visibility-hidden');
+                playButton.classList.remove('visibility-hidden');
+                titleScreen.addEventListener('transitionend', () => {
+                    _gameScreenController.resetGame();                
+                }, {once: true});   
+            });        
         }
         homeButton.addEventListener('click', returnToTitle);
+    })();
 
+    const _dialogBoxController = (() => {
+        const dialogBox = document.querySelector('.dialog-box-container');
+        const dialog = document.querySelector('.dialog');
+        const yesButton = document.querySelector('#yesButton');
+        const noButton = document.querySelector('#noButton');
+
+        const showDialog = (text, func) => {
+            dialog.textContent = text;
+            dialogBox.classList.remove('visibility-hidden');
+            yesButton.addEventListener('click', func, {once: true});
+        }
+
+        const hideDialog = () => {
+            dialogBox.classList.add('visibility-hidden');
+        }
+
+        yesButton.addEventListener('click', hideDialog);
+        noButton.addEventListener('click', hideDialog);
+
+        return {
+            showDialog,
+        }
     })();
 
     const _gameScreenController = (() => {
@@ -324,7 +349,11 @@ const game = (() => {
             refreshScreen();
             playAgainButton.classList.add('visibility-hidden');
         }
-        resetButton.addEventListener('click', resetGame);
+
+        const resetButtonClick = () => {
+            _dialogBoxController.showDialog(resetButton.dataset.dialog, resetGame);
+        }
+        resetButton.addEventListener('click', resetButtonClick);
 
         const playAgain = () => {
             _switchStartingPlayer();

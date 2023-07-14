@@ -137,6 +137,57 @@ a {
     fill: lightgrey;
 }
 
+.dialog-box-container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    visibility: visible;
+    transition: opacity 0.25s ease, visibility 0s ease 0s;
+}
+
+.dialog-box-container.visibility-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0s ease 0.25s;
+}
+
+.dialog-box {
+    height: 25vh;
+    width: 45vh;
+    background-color: var(--color-accent);
+    color: white;
+    font-size: 5vh;
+    text-align: center;
+    padding: 5vh;
+    border-radius: 5vh;
+    box-shadow: 0.5vh 0.5vh 0.5vh rgb(0, 0, 0, 0.25);
+}
+
+.dialog-box button{
+    font-size: 4vh;
+    margin: 3vh 2vh;
+    padding: 1vh 3vh;
+    height: 7.5vh;
+    width: 12vh;
+    background-color: var(--color-accent-light);
+    color: #fff;
+    border-radius: 3vh;
+    border: none;
+}
+
+.dialog-box button:hover {
+    background-color: var(--color-accent-light-hover);
+}
+
+.dialog-box button:active {
+    background-color: var(--color-accent-light-active);
+}
+
+
 .game-container {
     display: flex;
     flex-direction: column;
@@ -147,6 +198,8 @@ a {
     background-color: var(--color-accent);
     height: 8vh;
     color: #fff;
+    box-shadow: 0 0 0.5vh 0.5vh rgb(0, 0, 0, 0.25);
+    z-index: 1;
 }
 
 .header > .container {

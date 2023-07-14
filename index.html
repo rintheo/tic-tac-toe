@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pangolin&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"></head>
 <body>
     <div class="site-container">
-        <div class="title-screen">
+        <div class="title-screen visibility-hidden">
             <h1 class="title">Tic-Tac-Toe</h1>
             <div class="container">
                 <button id="playButton" class="button">Play Game</button>
@@ -32,14 +32,21 @@
                 </div>
             </footer>
         </div>
+        <div class="dialog-box-container visibility-hidden">
+            <div class="dialog-box">
+                <p class="dialog"><!-- Filled by JavaScript --></p>
+                <button id="yesButton">Yes</button>
+                <button id="noButton">No</button>
+            </div>
+        </div>
         <div class="game-container">
             <header class="header">
                 <div class="container max-width">
-                    <button id="homeButton" class="button">
+                    <button id="homeButton" class="button" data-dialog="Return to title?">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Return to Home Screen</title><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg>
                     </button>
                     <h2>Tic-Tac-Toe</h2>
-                    <button id="resetButton" class="button">
+                    <button id="resetButton" class="button" data-dialog="Reset game?">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Reset Game</title><path d="M12,6V9L16,5L12,1V4A8,8 0 0,0 4,12C4,13.57 4.46,15.03 5.24,16.26L6.7,14.8C6.25,13.97 6,13 6,12A6,6 0 0,1 12,6M18.76,7.74L17.3,9.2C17.74,10.04 18,11 18,12A6,6 0 0,1 12,18V15L8,19L12,23V20A8,8 0 0,0 20,12C20,10.43 19.54,8.97 18.76,7.74Z" /></svg>
                     </button>
                 </div>
