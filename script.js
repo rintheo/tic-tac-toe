@@ -1,18 +1,40 @@
 const game = (() => {
+    const _cell = () => {
+        let rowPosition = '';
+        let columnPosition = '';
+        let value = '';
+        
+        const setPosition = (row, column) => {
+            rowPosition = row;
+            columnPosition = column;
+        } 
+        const getRowPosition = () => rowPosition;
+        const getColumnPosition = () => columnPosition;
+
+        const setValue = () => value = _activePlayer.mark;
+        const getValue = () => value;
+
+        return {
+            setPosition,
+            getRowPosition,
+            getColumnPosition,
+            setValue,
+            getValue,
+
+        }
+    }
+
     const _gameBoard = (() => {
-        const _rows = 3,
-              _columns = 3,
-              _board = [
-                // [1,2,3],
-                // [4,5,6],
-                // [7,8,9],
-              ];
+        const rows = 3,
+              columns = 3,
+              board = [];
         
         const resetBoard = () => {
-            for (let i = 0; i < _rows; i++) {
-                _board[i] = [];
-                for (let j = 0; j < _columns; j++) {
-                    _board[i].push('');
+            for (let i = 0; i < rows; i++) {
+                board[i] = [];
+                for (let j = 0; j < columns; j++) {
+                    board[i].push(_cell());
+                    board[i][j].setPosition(i, j);
                 }
             }
         }
@@ -20,10 +42,13 @@ const game = (() => {
         // Initialize the board for the first game
         resetBoard();
     
-        const getRowCount = () => _rows;
-        const getColumnCount = () => _columns;
-        const getBoard = () => _board;
-        const printBoard = () => console.log(_board); // For console version only
+        const getRowCount = () => rows;
+        const getColumnCount = () => columns;
+        const getBoard = () => board;
+        const printBoard = () => {
+            const printedBoard = board.map(row => row.map(cell => cell.getValue()));
+            console.table(printedBoard);
+        } 
     
         return {
             getRowCount,
@@ -45,21 +70,22 @@ const game = (() => {
             mark: 'x',
             score: 0,
         },
-    ];
+    ]
 
     let _activePlayer = _players[0];
     const _switchActivePlayer = () => _activePlayer = _activePlayer === _players[0] ? _players[1] : _players[0];
     const _printActivePlayer = () => console.log(`It's ${_activePlayer.name}'s turn!`);
 
     let _winningPlayer = '';
+    let _winningLine = [];
 
     let _gameOver = false;
 
     const playRound = (row, column) => {
         if (_gameOver === true) return;
-        if (_gameBoard.getBoard()[row][column] !== '') return;
+        if (_gameBoard.getBoard()[row][column].getValue() !== '') return;
 
-        _gameBoard.getBoard()[row][column] = _activePlayer.mark;
+        _gameBoard.getBoard()[row][column].setValue();
         _gameBoard.printBoard(); // For console version only
 
         // Return true for successful round
@@ -118,11 +144,14 @@ const game = (() => {
             testLines[testLineIndex].push(_gameBoard.getBoard()[i][_gameBoard.getColumnCount() - 1 - i]);
         }
 
+        console.log(testLines.map(row => row.map(cell => cell.getValue())))
+
         // Check logged testLines for winning condition
         for (testLine of testLines) {
-            if (testLine.every(cell => (cell !== '') && (cell === testLine[0]))) {
+            if (testLine.every(cell => (cell.getValue() !== '') && (cell.getValue() === testLine[0].getValue()))) {
                 for (_player of _players) {
-                    if (_player.mark === testLine[0]) {
+                    if (_player.mark === testLine[0].getValue()) {
+                        _winningLine = testLine;
                         _winningPlayer = _player;
                         return true;
                     }
@@ -132,13 +161,14 @@ const game = (() => {
     }
 
     const _checkForDraw = () => {
-        if (_gameBoard.getBoard().flat().every(cell => cell !== '')) {
+        if (_gameBoard.getBoard().flat().every(cell => cell.getValue() !== '')) {
             return true;
         }
     }
 
     const restartGame = () => {
         _gameOver = false;
+        _winningLine = [];
         _winningPlayer = '';
         _gameBoard.resetBoard();
     }
@@ -184,7 +214,13 @@ const game = (() => {
             if (playRound(e.target.dataset.row, e.target.dataset.column)) {
                 refreshScreen();
                 if (_gameOver) {
-                    (_winningPlayer !== '') ? displayWinningPlayer() : displayDraw();
+                    if (_winningPlayer !== '') {
+                        displayWinningPlayer();
+                        highlightWinningLine(e.target.dataset.row, e.target.dataset.column);
+                    }
+                    else {
+                        displayDraw();
+                    }
                     displayPlayAgain();
                 }
                 // animateCell(e.target.dataset.row, e.target.dataset.column);
@@ -207,13 +243,20 @@ const game = (() => {
                     button.dataset.row = i;
                     button.dataset.column = j;
                     button.classList.add('cell');
-                    if (_gameBoard.getBoard()[i][j] === '') {
+                    if (_gameBoard.getBoard()[i][j].getValue() === '') {
                         _activePlayer.mark === 'o' ? button.classList.add('one') : button.classList.add('two');
                     }
-                    button.textContent = _gameBoard.getBoard()[i][j];
+                    button.textContent = _gameBoard.getBoard()[i][j].getValue();
                     button.addEventListener('click', clickBoard);
                     board.appendChild(button);
                 }           
+            }
+        }
+
+        const highlightWinningLine = (row, column) => {
+            for (cell of _winningLine) {
+                const winningCell = document.querySelector(`[data-row='${cell.getRowPosition()}'][data-column='${cell.getColumnPosition()}']`);
+                winningCell.classList.add('winner');
             }
         }
 

@@ -149,6 +149,10 @@ p, button {
     content: 'x';
 }
 
+.cell.winner {
+    color: lightgreen;
+}
+
 /* .cell.clicked {
     background-color: var(--color-accent-lightest);
 } */
