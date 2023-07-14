@@ -72,6 +72,11 @@ const game = (() => {
         },
     ]
 
+    const _setPlayerNames = (player1, player2) => {
+        _players[0].name = player1;
+        _players[1].name = player2;
+    }
+
     let _activePlayer = _players[0];
     const _switchActivePlayer = () => _activePlayer = _activePlayer === _players[0] ? _players[1] : _players[0];
     const _printActivePlayer = () => console.log(`It's ${_activePlayer.name}'s turn!`);
@@ -194,8 +199,13 @@ const game = (() => {
         const vsPlayerButton = document.querySelector('#vsPlayerButton');
         const vsAIButton = document.querySelector('#vsAIButton');
         const homeButton = document.querySelector('#homeButton');
+        const formContainer = document.querySelector('.form-container');
+        const form = document.querySelector('.form');
+        const player1Name = document.querySelector('#player1NameInput');
+        const player2Name = document.querySelector('#player2NameInput');
+        const submitNamesButton = document.querySelector('#submitNamesButton');
 
-        const playGame = () => {
+        const playGame = (e) => {
             playButton.classList.add('visibility-hidden');
             playButton.addEventListener('transitionend', () => {
                 vsButtons.classList.remove('visibility-hidden');
@@ -203,15 +213,29 @@ const game = (() => {
         }
         playButton.addEventListener('click', playGame);
         
-        const playVersusPlayer = () => {
-            titleScreen.classList.add('visibility-hidden');
-            titleScreen.addEventListener('transitionend', () => {
-                vsButtons.classList.add('visibility-hidden');
-            }, {once: true});
+        const playVersusPlayer = (e) => {
+            vsButtons.classList.add('visibility-hidden');
+            vsButtons.addEventListener('transitionend', () => {
+                formContainer.classList.remove('visibility-hidden');
+            }, {once: true})
         }
         vsPlayerButton.addEventListener('click', playVersusPlayer);
 
-        const returnToTitle = () => {
+        const submitNamesStartGame = (e) => {
+            let player1 = player1Name.value !== '' ? player1Name.value : 'Player One';
+            let player2 = player2Name.value !== '' ? player2Name.value : 'Player Two';
+            _setPlayerNames(player1, player2);
+            _gameScreenController.resetGame();         
+            titleScreen.classList.add('visibility-hidden');
+            titleScreen.addEventListener('transitionend', () => {
+                formContainer.classList.add('visibility-hidden');
+            }, {once: true});
+            form.reset();
+            e.preventDefault();
+        }
+        submitNamesButton.addEventListener('click', submitNamesStartGame);
+
+        const returnToTitle = (e) => {
             _dialogBoxController.showDialog(homeButton.dataset.dialog ,() => {
                 titleScreen.classList.remove('visibility-hidden');
                 playButton.classList.remove('visibility-hidden');
@@ -220,9 +244,9 @@ const game = (() => {
                 }, {once: true});   
             });        
         }
-        homeButton.addEventListener('click', returnToTitle);
+        homeButton.addEventListener('click', returnToTitle);        
     })();
-
+    
     const _dialogBoxController = (() => {
         const dialogBox = document.querySelector('.dialog-box-container');
         const dialog = document.querySelector('.dialog');
@@ -252,7 +276,9 @@ const game = (() => {
         const board = document.querySelector('.board');
         const playAgainButton = document.querySelector('#playAgainButton');
         const resetButton = document.querySelector('#resetButton');
+        const player1Name = document.querySelector('#player1Name');
         const player1Score = document.querySelector('#player1Score');
+        const player2Name = document.querySelector('#player2Name');
         const player2Score = document.querySelector('#player2Score');
 
         const displayActivePlayer = () => {
@@ -269,6 +295,13 @@ const game = (() => {
 
         const displayPlayAgain = () => {
             playAgainButton.classList.remove('visibility-hidden');
+        }
+
+        console.log(player1Name);
+
+        const displayPlayerNames = () => {
+            player1Name.textContent = _players[0].name;
+            player2Name.textContent = _players[1].name;
         }
 
         const displayPlayerScores = () => {
@@ -368,11 +401,11 @@ const game = (() => {
             clearBoard();
             generateBoard();
             displayPlayerScores();
+            displayPlayerNames();
         }
         
         // Initialize for the first game
-        displayActivePlayer();
-        generateBoard();
+        refreshScreen();
 
         return {
             resetGame,

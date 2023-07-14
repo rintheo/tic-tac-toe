@@ -10,13 +10,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Pangolin&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"></head>
 <body>
     <div class="site-container">
-        <div class="title-screen visibility-hidden">
+        <div class="title-screen">
             <h1 class="title">Tic-Tac-Toe</h1>
             <div class="container">
                 <button id="playButton" class="button">Play Game</button>
                 <div class="vs visibility-hidden">
                     <button id="vsPlayerButton" class="button">Versus Player</button>
                     <button id="vsAIButton" class="button">Versus AI</button>
+                </div>
+                <div class="form-container visibility-hidden">
+                    <form class="form" action="">
+                        <ul>
+                            <li>
+                                <label for="player1NameInput">Player 1</label>
+                                <input 
+                                    type="text" 
+                                    id="player1NameInput" 
+                                    class="button" 
+                                    placeholder="Name" 
+                                    maxlength="8">
+                            </li>
+                            <li>
+                                <label for="player2NameInput">Player 2</label>
+                                <input 
+                                    type="text" 
+                                    id="player2NameInput" 
+                                    class="button" 
+                                    placeholder="Name" 
+                                    maxlength="8">
+                            </li>
+                            <li>
+                                <button type="submit" id="submitNamesButton">Play</button>
+                            </li>
+                        </ul>
+                    </form>
                 </div>
             </div>
             <footer class="footer">
