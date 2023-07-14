@@ -81,6 +81,11 @@ const game = (() => {
 
     let _gameOver = false;
 
+    const _resetScores = () => {
+        _players[0].score = 0;
+        _players[1].score = 0;
+    }
+
     const playRound = (row, column) => {
         if (_gameOver === true) return;
         if (_gameBoard.getBoard()[row][column].getValue() !== '') return;
@@ -167,6 +172,7 @@ const game = (() => {
     }
 
     const restartGame = () => {
+        _activePlayer = _players[0];
         _gameOver = false;
         _winningLine = [];
         _winningPlayer = '';
@@ -203,34 +209,40 @@ const game = (() => {
             player2Score.textContent = _players[1].score;
         }
 
-        const refreshScreen = () => {
-            displayActivePlayer();
-            clearBoard();
-            generateBoard();
-            displayPlayerScores();
-        }
-
         const clickBoard = (e) => {
-            if (playRound(e.target.dataset.row, e.target.dataset.column)) {
+            
+            if (playRound(e.currentTarget.dataset.row, e.currentTarget.dataset.column)) {
                 refreshScreen();
                 if (_gameOver) {
                     if (_winningPlayer !== '') {
                         displayWinningPlayer();
-                        highlightWinningLine(e.target.dataset.row, e.target.dataset.column);
+                        highlightWinningLine();
                     }
                     else {
                         displayDraw();
                     }
                     displayPlayAgain();
+                    return;
                 }
-                // animateCell(e.target.dataset.row, e.target.dataset.column);
+                animateClickedCell(e.currentTarget.dataset.row, e.currentTarget.dataset.column);
+                return
+            }
+            if (!_gameOver) {
+                animateInvalidCell(e.currentTarget.dataset.row, e.currentTarget.dataset.column);
             }
         }
 
-        // const animateCell = (row, column) => {
-        //     const clickedCell = document.querySelector(`[data-row='${row}'][data-column='${column}']`)
-        //     clickedCell.classList.add('clicksed');
-        // }
+        const animateClickedCell = (row, column) => {
+            const clickedCell = document.querySelector(`[data-row='${row}'][data-column='${column}']`)
+            clickedCell.classList.add('clicked');
+            clickedCell.addEventListener('animationend', () => {clickedCell.classList.remove('clicked')})
+        }
+
+        const animateInvalidCell = (row, column) => {
+            const invalidCell = document.querySelector(`[data-row='${row}'][data-column='${column}']`)
+            invalidCell.classList.add('invalid');
+            invalidCell.addEventListener('animationend', () => {invalidCell.classList.remove('invalid')})
+        }
 
         const clearBoard = () => {
             while (board.firstChild) {board.removeChild(board.firstChild)};
@@ -240,25 +252,33 @@ const game = (() => {
             for (let i = 0; i < _gameBoard.getRowCount(); i++) {
                 for (let j = 0; j < _gameBoard.getColumnCount(); j++) {
                     const button = document.createElement('button');
+                    const span = document.createElement('span');
                     button.dataset.row = i;
                     button.dataset.column = j;
                     button.classList.add('cell');
-                    if (_gameBoard.getBoard()[i][j].getValue() === '') {
+                    if ((_gameBoard.getBoard()[i][j].getValue() === '') && (!_gameOver)) {
                         _activePlayer.mark === 'o' ? button.classList.add('one') : button.classList.add('two');
                     }
-                    button.textContent = _gameBoard.getBoard()[i][j].getValue();
+                    span.textContent = _gameBoard.getBoard()[i][j].getValue();
                     button.addEventListener('click', clickBoard);
+                    button.appendChild(span);
                     board.appendChild(button);
                 }           
             }
         }
 
-        const highlightWinningLine = (row, column) => {
+        const highlightWinningLine = () => {
             for (cell of _winningLine) {
                 const winningCell = document.querySelector(`[data-row='${cell.getRowPosition()}'][data-column='${cell.getColumnPosition()}']`);
                 winningCell.classList.add('winner');
             }
         }
+
+        const resetGame = () => {
+            _resetScores();
+            playAgain();
+        }
+        resetButton.addEventListener('click', resetGame);
 
         const playAgain = () => {
             restartGame();
@@ -267,13 +287,12 @@ const game = (() => {
         }
         playAgainButton.addEventListener('click', playAgain);
 
-        const resetGame = () => {
-            _players[0].score = 0;
-            _players[1].score = 0;
-            _activePlayer = _players[0];
-            playAgain();
+        const refreshScreen = () => {
+            displayActivePlayer();
+            clearBoard();
+            generateBoard();
+            displayPlayerScores();
         }
-        resetButton.addEventListener('click', resetGame);
         
         // Initialize for the first game
         displayActivePlayer();
