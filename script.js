@@ -229,8 +229,8 @@ const game = (() => {
             titleScreen.classList.add('visibility-hidden');
             titleScreen.addEventListener('transitionend', () => {
                 formContainer.classList.add('visibility-hidden');
-            }, {once: true});
-            form.reset();
+                form.reset();
+            }, {once: true});            
             e.preventDefault();
         }
         submitNamesButton.addEventListener('click', submitNamesStartGame);
