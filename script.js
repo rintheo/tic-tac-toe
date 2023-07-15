@@ -257,6 +257,9 @@ const game = (() => {
             dialog.textContent = text;
             dialogBox.classList.remove('visibility-hidden');
             yesButton.addEventListener('click', func, {once: true});
+            noButton.addEventListener('click', () => {
+                yesButton.removeEventListener('click', func);
+            });
         }
 
         const hideDialog = () => {
