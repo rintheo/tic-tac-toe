@@ -69,8 +69,16 @@ const game = (() => {
             name: 'Player Two',
             mark: 'x',
             score: 0,
+            isAI: false,
+            AIDifficulty: 'Easy',
         },
     ]
+
+    const _playVersusPlayer = () => {_players[1].isAI = false}
+    const _playVersusAI = () => {_players[1].isAI = true}
+    const _toggleAIDifficulty = () => {
+        _players[1].AIDifficulty = _players[1].AIDifficulty !== 'Easy' ? 'Easy' : 'Hard'; 
+    }
 
     const _setPlayerNames = (player1, player2) => {
         _players[0].name = player1;
@@ -201,9 +209,14 @@ const game = (() => {
         const homeButton = document.querySelector('#homeButton');
         const formContainer = document.querySelector('.form-container');
         const form = document.querySelector('.form');
+        const player2InputContainer = document.querySelector('.player2-input-container');
+        const AIDifficultyContainer = document.querySelector('.AI-difficulty-container');
+        const AIEasyButton = document.querySelector('#AIEasyButton');        
+        const AIHardButton = document.querySelector('#AIHardButton');        
         const player1Name = document.querySelector('#player1NameInput');
         const player2Name = document.querySelector('#player2NameInput');
         const submitNamesButton = document.querySelector('#submitNamesButton');
+        const backButton = document.querySelector('#backButton');
 
         const playGame = (e) => {
             playButton.classList.add('visibility-hidden');
@@ -213,17 +226,54 @@ const game = (() => {
         }
         playButton.addEventListener('click', playGame);
         
-        const playVersusPlayer = (e) => {
+        const playVersus = (e) => {
+            if (e.target === vsPlayerButton) {
+                _playVersusPlayer()
+                player2InputContainer.classList.remove('visibility-hidden');
+                AIDifficultyContainer.classList.add('visibility-hidden');
+            }
+            else if (e.target === vsAIButton) {
+                _playVersusAI()
+                AIDifficultyContainer.classList.remove('visibility-hidden');
+                player2InputContainer.classList.add('visibility-hidden');
+            }
             vsButtons.classList.add('visibility-hidden');
             vsButtons.addEventListener('transitionend', () => {
                 formContainer.classList.remove('visibility-hidden');
-            }, {once: true})
+            }, {once: true});
         }
-        vsPlayerButton.addEventListener('click', playVersusPlayer);
+        vsPlayerButton.addEventListener('click', playVersus);
+        vsAIButton.addEventListener('click', playVersus);
+
+        const toggleAIDifficulty = () => {
+            _toggleAIDifficulty();
+            AIEasyButton.classList.remove('toggled')
+            AIHardButton.classList.remove('toggled')
+            if (_players[1].AIDifficulty === 'Easy') {AIEasyButton.classList.add('toggled')}
+            else if (_players[1].AIDifficulty === 'Hard') {AIHardButton.classList.add('toggled')}
+        }
+        AIEasyButton.addEventListener('click', toggleAIDifficulty);
+        AIHardButton.addEventListener('click', toggleAIDifficulty);
+
+        const resetAIDifficulty = () => {
+            if (_players[1].AIDifficulty === 'Hard') {toggleAIDifficulty()};
+        }
+
+        const returnToVersus = (e) => {            
+            formContainer.classList.add('visibility-hidden')            
+            formContainer.addEventListener('transitionend', () => {
+                vsButtons.classList.remove('visibility-hidden');
+                form.reset();
+                resetAIDifficulty();
+            }, {once: true});
+        }
+        backButton.addEventListener('click', returnToVersus);
 
         const submitNamesStartGame = (e) => {
             let player1 = player1Name.value !== '' ? player1Name.value : 'Player One';
-            let player2 = player2Name.value !== '' ? player2Name.value : 'Player Two';
+            
+            let player2 = player2Name.value !== '' ? player2Name.value :
+                          _players[1].isAI ? `AI ${_players[1].AIDifficulty}` : 'Player Two';
             _setPlayerNames(player1, player2);
             _gameScreenController.resetGame();         
             titleScreen.classList.add('visibility-hidden');
@@ -240,7 +290,8 @@ const game = (() => {
                 titleScreen.classList.remove('visibility-hidden');
                 playButton.classList.remove('visibility-hidden');
                 titleScreen.addEventListener('transitionend', () => {
-                    _gameScreenController.resetGame();                
+                    _gameScreenController.resetGame();     
+                    resetAIDifficulty();           
                 }, {once: true});   
             });        
         }
@@ -299,8 +350,6 @@ const game = (() => {
         const displayPlayAgain = () => {
             playAgainButton.classList.remove('visibility-hidden');
         }
-
-        console.log(player1Name);
 
         const displayPlayerNames = () => {
             player1Name.textContent = _players[0].name;

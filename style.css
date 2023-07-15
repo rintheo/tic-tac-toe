@@ -76,12 +76,13 @@ ul, ol, li {
 
 .title + .container {
     position: relative;
-    margin-bottom: 25vh;
+    margin-bottom: 15vh;
     width: 30vh;
-    height: 25vh;
+    height: 35vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* border: 1px solid #000; */
 }
 
 #playButton,
@@ -141,9 +142,18 @@ ul, ol, li {
 }
 
 .form li {
+    position: relative;
+}
+
+.form li,
+.player2-input-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+}
+
+.player-input {    
     margin-bottom: 2vh;
 }
 
@@ -174,8 +184,39 @@ ul, ol, li {
     color: lightgrey;
 }
 
+.AI-difficulty-container {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.AI-difficulty-container > p {
+    flex: 1;
+    font-size: 2.5vh;
+}
+
+.AI-difficulty-container > div {
+    flex: 0 0 20vh;
+    display: flex;
+    gap: 1vh;
+}
+
+.button.AI-difficulty{
+    font-size: 2.5vh;
+    height: 4vh;
+    padding: 0;
+    border-radius: 1vh;
+}
+
+.button.AI-difficulty.toggled {
+    outline: 0.35vh solid var(--color-accent-lightest);
+}
+
 #submitNamesButton {
-    margin-top: 2vh;   
+    margin: 2vh 0;   
 }
 
 .footer {

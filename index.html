@@ -21,7 +21,7 @@
                 <div class="form-container visibility-hidden">
                     <form class="form" action="">
                         <ul>
-                            <li>
+                            <li class="player-input">
                                 <label for="player1NameInput">Player 1</label>
                                 <input 
                                     type="text" 
@@ -30,20 +30,30 @@
                                     placeholder="Name" 
                                     maxlength="8">
                             </li>
-                            <li>
-                                <label for="player2NameInput">Player 2</label>
-                                <input 
-                                    type="text" 
-                                    id="player2NameInput" 
-                                    class="button" 
-                                    placeholder="Name" 
-                                    maxlength="8">
+                            <li class="player-input">
+                                <div class="player2-input-container">
+                                    <label for="player2NameInput">Player 2</label>
+                                    <input 
+                                        type="text" 
+                                        id="player2NameInput" 
+                                        class="button" 
+                                        placeholder="Name" 
+                                        maxlength="8">
+                                </div>
+                                <div class="AI-difficulty-container visibility-hidden">
+                                    <p>AI Lvl</p>
+                                    <div>
+                                        <button type="button" id="AIEasyButton" class="button AI-difficulty toggled">Easy</button>
+                                        <button type="button" id="AIHardButton" class="button AI-difficulty">Hard</button>    
+                                    </div>
+                                </div>
                             </li>
                             <li>
-                                <button type="submit" id="submitNamesButton">Play</button>
+                                <button type="submit" id="submitNamesButton" class="button">Play</button>
                             </li>
                         </ul>
                     </form>
+                    <button id="backButton" class="button">Back</button>
                 </div>
             </div>
             <footer class="footer">
