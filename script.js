@@ -10,6 +10,7 @@ const game = (() => {
         } 
         const getRowPosition = () => rowPosition;
         const getColumnPosition = () => columnPosition;
+        const getPosition = () => [rowPosition, columnPosition];
 
         const setValue = () => value = _activePlayer.mark;
         const getValue = () => value;
@@ -18,6 +19,7 @@ const game = (() => {
             setPosition,
             getRowPosition,
             getColumnPosition,
+            getPosition,
             setValue,
             getValue,
 
@@ -64,6 +66,7 @@ const game = (() => {
             name: 'Player One',
             mark: 'o',
             score: 0,
+            isAI: false,
         },
         {
             name: 'Player Two',
@@ -199,6 +202,28 @@ const game = (() => {
         _winningPlayer = '';
         _gameBoard.resetBoard();
     }
+
+    const _AIEasy = (() => {
+        let possibleChoices = [];
+
+        const generatePossibleChoices = () => {
+            possibleChoices = [];
+            for (row of _gameBoard.getBoard()) {
+                for (cell of row) {
+                    if (cell.getValue() === '') {possibleChoices.push(cell.getPosition())}
+                }
+            }
+        }
+        
+        const getChoice = () => {
+            generatePossibleChoices();
+            return possibleChoices[~~(Math.random() * possibleChoices.length)];
+        }
+
+        return {
+            getChoice,
+        }
+    })();
 
     const _titleScreenController = (() => {
         const titleScreen = document.querySelector('.title-screen');
@@ -336,11 +361,21 @@ const game = (() => {
         const player2Score = document.querySelector('#player2Score');
 
         const displayActivePlayer = () => {
-            mainTop.textContent = `${_activePlayer.name}'s turn`;
+            mainTop.textContent = _players[1].isAI ?
+                                  `Playing with AI ${_players[1].AIDifficulty}` :
+                                  `${_activePlayer.name}'s turn` ;
         }
 
         const displayWinningPlayer = () => {
-            mainTop.textContent = `${_winningPlayer.name} wins!!`;
+            if (_players[1].isAI) {
+                mainTop.textContent = _winningPlayer === _players[0] ? 
+                                     `You win!!` : 
+                                     `AI ${_players[1].AIDifficulty} wins!!`;
+            }
+            else {
+                mainTop.textContent = `${_winningPlayer.name} wins!!`;
+            }
+            
         }
 
         const displayDraw = () => {
@@ -362,7 +397,19 @@ const game = (() => {
         }
 
         const clickBoard = (e) => {            
-            if (playRound(e.currentTarget.dataset.row, e.currentTarget.dataset.column)) {
+            let row = '';
+            let column = '';
+            
+            if ((_activePlayer === _players[1]) && (_players[1].isAI)) {
+                row = e[0];
+                column = e[1];
+            }
+            else {
+                row = e.currentTarget.dataset.row;
+                column = e.currentTarget.dataset.column;
+            }
+
+            if (playRound(row, column)) {
                 refreshScreen();
                 if (_gameOver) {
                     if (_winningPlayer !== '') {
@@ -375,11 +422,15 @@ const game = (() => {
                     displayPlayAgain();
                     return;
                 }
-                animateClickedCell(e.currentTarget.dataset.row, e.currentTarget.dataset.column);
+                if (_activePlayer.isAI) {
+                    clickBoard(_AIEasy.getChoice());
+                }
+                animateClickedCell(row, column);
                 return
             }
+
             if (!_gameOver) {
-                animateInvalidCell(e.currentTarget.dataset.row, e.currentTarget.dataset.column);
+                animateInvalidCell(row, column);
             }
         }
 
@@ -411,7 +462,11 @@ const game = (() => {
                         _activePlayer.mark === 'o' ? button.classList.add('one') : button.classList.add('two');
                     }
                     span.textContent = _gameBoard.getBoard()[i][j].getValue();
-                    button.addEventListener('click', clickBoard);
+                    if (!_activePlayer.isAI){
+                        button.addEventListener('click', clickBoard);
+                        button.classList.add('player');
+                    }
+
                     button.appendChild(span);
                     board.appendChild(button);
                 }           
@@ -445,6 +500,9 @@ const game = (() => {
             restartGame();
             refreshScreen();
             playAgainButton.classList.add('visibility-hidden');
+            if (_activePlayer.isAI) {
+                clickBoard(_AIEasy.getChoice());
+            }
         }
         playAgainButton.addEventListener('click', playAgain);
 
@@ -453,14 +511,15 @@ const game = (() => {
             clearBoard();
             generateBoard();
             displayPlayerScores();
-            displayPlayerNames();
+            displayPlayerNames();           
         }
         
         // Initialize for the first game
         refreshScreen();
 
         return {
-            resetGame,
+            clickBoard,
+            resetGame,            
         }
     })();
 

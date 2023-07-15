@@ -399,23 +399,23 @@ ul, ol, li {
     font-size: min(20vh, 30vw);
 }
 
-.cell.one::before {
+.cell.one.player::before {
     content: 'o';
 
 }
 
-.cell.two::before {
+.cell.two.player::before {
     content: 'x';
 }
 
-.cell::before {
+.cell.player::before {
     color: var(--color-accent-light);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.1s ease, visibility 0s ease 0.1s;
 }
 
-.cell:hover::before {
+.cell.player:hover::before {
     opacity: 0.25;
     visibility: visible;
     transition: opacity 0.1s ease, visibility 0s ease 0s;
