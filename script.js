@@ -12,7 +12,7 @@ const game = (() => {
         const getColumnPosition = () => columnPosition;
         const getPosition = () => [rowPosition, columnPosition];
 
-        const setValue = () => value = _activePlayer.mark;
+        const setValue = (mark) => value = mark;
         const getValue = () => value;
 
         return {
@@ -22,12 +22,11 @@ const game = (() => {
             getPosition,
             setValue,
             getValue,
-
         }
     }
 
-    const _gameBoard = (() => {
-        const rows = 3,
+    const _gameBoard = () => {
+        let rows = 3,
               columns = 3,
               board = [];
         
@@ -40,9 +39,6 @@ const game = (() => {
                 }
             }
         }
-    
-        // Initialize the board for the first game
-        resetBoard();
     
         const getRowCount = () => rows;
         const getColumnCount = () => columns;
@@ -59,7 +55,38 @@ const game = (() => {
             printBoard, // For console version only
             resetBoard,
         }
-    })();
+    };
+
+    const _board = _gameBoard();
+
+
+    // temporary end state board =================================================
+    const ENDSTATE = () => {
+        _board.getBoard()[0][2].setValue('x');
+        _board.getBoard()[1][0].setValue('x');
+        _board.getBoard()[2][0].setValue('x');
+        _board.getBoard()[2][1].setValue('o');
+        _board.getBoard()[2][2].setValue('o');
+
+        //remember to put at [0][0] 'o' to initialize this end state
+    }
+
+    const ENDSTATEFATAL = () => {
+        _board.getBoard()[0][1].setValue('o');
+        _board.getBoard()[1][2].setValue('o');
+        _board.getBoard()[2][0].setValue('x');
+        _board.getBoard()[2][1].setValue('x');
+
+        //remember to put at [2][2] 'o' to initialize this end state
+    }
+
+    
+
+    // ============================================================================
+
+
+    // Initialize the board for the first game
+    _board.resetBoard();
 
     const _players = [
         {
@@ -111,87 +138,85 @@ const game = (() => {
 
     const playRound = (row, column) => {
         if (_gameOver === true) return;
-        if (_gameBoard.getBoard()[row][column].getValue() !== '') return;
+        if (_board.getBoard()[row][column].getValue() !== '') return;
 
-        _gameBoard.getBoard()[row][column].setValue();
-        _gameBoard.printBoard(); // For console version only
+        _board.getBoard()[row][column].setValue(_activePlayer.mark);
+        // board.printBoard(); // For console version only
 
         // Return true for successful round
-
-        if (_checkForWinner()) {
+        if (_checkForWinner(_board)) {
             _gameOver = true;
             _winningPlayer.score += 1;
             console.log(`Winner is ${_winningPlayer.name}!`);
             return true;
-        }      
+        }        
                 
-        if (_checkForDraw()) {
+        if (_checkForDraw(_board)) {
             _gameOver = true;
             console.log('draw');
             return true;
-        }
+        } 
 
         _switchActivePlayer();
-        _printActivePlayer();
+        // _printActivePlayer(); // for debugging
 
         return true;
     }
     
-    const _checkForWinner = () => {
+    const _checkForWinner = (board) => {
         let testLines = [];
         let testLineIndex = 0;
         let check = false;
 
         // Log each row 
-        for (let i = 0; i < _gameBoard.getRowCount(); i++) {
+        for (let i = 0; i < board.getRowCount(); i++) {
             testLines[testLineIndex] = [];
-            for (let j = 0; j < _gameBoard.getColumnCount(); j++) {
-                testLines[testLineIndex].push(_gameBoard.getBoard()[i][j]);
+            for (let j = 0; j < board.getColumnCount(); j++) {
+                testLines[testLineIndex].push(board.getBoard()[i][j]);
             }
             testLineIndex++;
         }        
 
         // Log each column 
-        for (let j = 0; j < _gameBoard.getColumnCount(); j++) {
+        for (let j = 0; j < board.getColumnCount(); j++) {
             testLines[testLineIndex] = [];
-            for (let i = 0; i < _gameBoard.getRowCount(); i++) {
-                testLines[testLineIndex].push(_gameBoard.getBoard()[i][j]);
+            for (let i = 0; i < board.getRowCount(); i++) {
+                testLines[testLineIndex].push(board.getBoard()[i][j]);
             }
             testLineIndex++;
         }
 
         // Log back diagonal
         testLines[testLineIndex] = [];
-        for (let i = 0; i <_gameBoard.getRowCount(); i++) {
-            testLines[testLineIndex].push(_gameBoard.getBoard()[i][i]);
+        for (let i = 0; i <board.getRowCount(); i++) {
+            testLines[testLineIndex].push(board.getBoard()[i][i]);
         }
         testLineIndex++;
 
         // Log front diagonal
         testLines[testLineIndex] = [];
-        for (let i = 0; i <_gameBoard.getRowCount(); i++) {
-            testLines[testLineIndex].push(_gameBoard.getBoard()[i][_gameBoard.getColumnCount() - 1 - i]);
+        for (let i = 0; i <board.getRowCount(); i++) {
+            testLines[testLineIndex].push(board.getBoard()[i][board.getColumnCount() - 1 - i]);
         }
-
-        console.log(testLines.map(row => row.map(cell => cell.getValue())))
-
+        
         // Check logged testLines for winning condition
         for (testLine of testLines) {
             if (testLine.every(cell => (cell.getValue() !== '') && (cell.getValue() === testLine[0].getValue()))) {
-                _winningLine.push(testLine);
+                if(!_AI.isMinimaxRunning()) {_winningLine.push(testLine)};
                 for (_player of _players) {
                     if (_player.mark === testLine[0].getValue()) {
-                        _winningPlayer = _player;
+                        if(!_AI.isMinimaxRunning()) {_winningPlayer = _player};                        
                         check = true;
                     }
                 }
             }
         }
+        // console.log(_winningLine);
         return check;
     }
 
-    const _checkForDraw = () => {
-        if (_gameBoard.getBoard().flat().every(cell => cell.getValue() !== '')) {
+    const _checkForDraw = (board) => {
+        if (board.getBoard().flat().every(cell => cell.getValue() !== '')) {
             return true;
         }
     }
@@ -200,30 +225,161 @@ const game = (() => {
         _gameOver = false;
         _winningLine = [];
         _winningPlayer = '';
-        _gameBoard.resetBoard();
+        _board.resetBoard();
     }
 
-    const _AIEasy = (() => {
-        let possibleChoices = [];
-
-        const generatePossibleChoices = () => {
-            possibleChoices = [];
-            for (row of _gameBoard.getBoard()) {
-                for (cell of row) {
-                    if (cell.getValue() === '') {possibleChoices.push(cell.getPosition())}
+    const _AI = (() => {
+        // let instanceBoard = _gameBoard();
+        
+        const copyCurrentBoardState = (board) => {
+            let copiedBoard = _gameBoard();
+            // instanceBoard.getBoard().splice(0, instanceBoard.getBoard().length);
+            for (let i = 0; i < copiedBoard.getRowCount(); i++) {
+                copiedBoard.getBoard()[i] = [];
+                for (let j = 0; j < copiedBoard.getColumnCount(); j++) {
+                    copiedBoard.getBoard()[i].push(_cell());
+                    copiedBoard.getBoard()[i][j].setValue(board.getBoard()[i][j].getValue())
+                    copiedBoard.getBoard()[i][j].setPosition(i, j);
                 }
             }
+            return copiedBoard
+        }
+
+        const instanceStartingActivePlayer = _players[1];
+        const switchInstanceActivePlayer = (player) => {
+            return player === _players[0] ? _players[1] : _players[0];
+        }
+
+        const generatePossibleChoices = (board) => {
+            const choices = [];
+            for (row of board.getBoard()) {
+                for (cell of row) {
+                    if (cell.getValue() === '') {choices.push(cell.getPosition())}
+                }
+            }
+            return choices;
         }
         
         const getChoice = () => {
-            generatePossibleChoices();
-            return possibleChoices[~~(Math.random() * possibleChoices.length)];
+            if (_players[1].AIDifficulty === 'Hard') {
+                minimaxRunning = true;
+                minimax(copyCurrentBoardState(_board), 0, instanceStartingActivePlayer);
+                minimaxRunning = false;
+                // console.log('minimaxChoices:')
+                // console.log(minimaxChoices)
+    
+                const sorted = minimaxChoices.sort((a, b) => b.score - a.score);
+                const filtered = sorted.filter(choice => sorted[0].score === choice.score);
+                // console.log(filtered);
+    
+                return filtered[~~(Math.random() * filtered.length)].position;
+                // call minimax(instanceBoard, 0)
+                // return minimax position value
+                // console.log(`RAN MINIMAX ${ranMinimax}`);
+            }
+            else if (_players[1].AIDifficulty === 'Easy') {
+                const possibleChoices = generatePossibleChoices(_board);
+                return possibleChoices[~~(Math.random() * possibleChoices.length)];        
+            }
+        }
+        
+        // for debugging
+        let ranMinimax = 0;
+
+        let minimaxChoices = [];
+        let minimaxRunning = false;
+        const isMinimaxRunning = () => minimaxRunning;
+
+        const minimax = (board, depth, activePlayer) => {
+            let currentBoard = copyCurrentBoardState(board);
+            let currentDepth = depth + 1; 
+            // let currentDepth = 0;
+
+            // for debugging
+            // console.log(`START MINIMAX | depth = ${currentDepth}`)    
+            // ranMinimax += 1;
+
+            let currentPossibleChoices = generatePossibleChoices(currentBoard)
+                                            .map(pos => {return {position: pos, score: 0}});
+
+            // console.log('current possible choices below');
+            // console.log(currentPossibleChoices);
+
+            for (choice of currentPossibleChoices) {
+                const row = choice.position[0];
+                const column = choice.position[1];
+                let testBoard = copyCurrentBoardState(currentBoard);
+
+                // console.log(`FOR LOOP START | depth = ${currentDepth}`)
+                // console.log(`choice below: current player is ${activePlayer.name}`)
+                // console.log(`choice #${currentPossibleChoices.indexOf(choice) + 1}/${currentPossibleChoices.length}: ${choice.position}`);    
+                
+                testBoard.getBoard()[row][column].setValue(activePlayer.mark);
+                
+                // console.table(testBoard.printBoard());
+                
+                if (!_checkForWinner(testBoard)) {                  
+                    if (_checkForDraw(testBoard)) {
+                        // console.log('draw');
+                        choice.score = 0 + currentDepth; 
+                    }
+                    else {
+                        // console.log('no winner');
+                        choice.score = minimax(testBoard, currentDepth, switchInstanceActivePlayer(activePlayer));
+                    }
+                }
+                else {
+                    // console.log('yes winner');
+                    choice.score = activePlayer === _players[0] ? -10 + currentDepth : 10 + currentDepth;
+                }  
+                testBoard.getBoard()[row][column].setValue('');
+                // console.log(`FOR LOOP END | depth = ${currentDepth}`)
+            }
+
+            // console.log(`Current Possible Choices with Score: ${activePlayer.name}'s turn`);
+            // console.table(currentPossibleChoices);
+            // console.log(currentPossibleChoices.map(choice => choice.score));
+
+            // console.log('cloning:')
+            // console.log(currentPossibleChoices.slice())
+            minimaxChoices = currentPossibleChoices.slice();
+            if (activePlayer === _players[0]) {
+                // console.log(`returning minimum value: ${Math.min(...currentPossibleChoices.map(choice => choice.score))}`)
+                return Math.min(...currentPossibleChoices.map(choice => choice.score));
+            }
+            else {
+                // console.log(`returning maximum value: ${Math.max(...currentPossibleChoices.map(choice => choice.score))}`)
+                return Math.max(...currentPossibleChoices.map(choice => choice.score));
+            }
+
+            console.log(`END MINIMAX | depth = ${currentDepth}`)    
+            
+            // current player (starts with AI) 
+            // list possible moves [{position, score}, ...] ***
+            // minimax depth +1
+            // loop through each possible moves (stop loop after last possible move), set new board
+                // if check win didnt return true, 
+                    // switch current player
+                    // current move = recurse^ *** (expected return value: {position, score})
+                // else if check win returns true
+                    // check winning player
+                    // AI wins, add score to position +10 + depth 
+                    // player wins, add score to position -10 + depth
+                // else if possible moves 0
+                    // draw score, add score to position 0 + depth
+            // if current player is AI
+                // return {position, score} with max score
+            // else if current player is player
+                // return {position, score} with minimum score                       
         }
 
         return {
             getChoice,
+            isMinimaxRunning,
         }
     })();
+
+    
 
     const _titleScreenController = (() => {
         const titleScreen = document.querySelector('.title-screen');
@@ -352,7 +508,7 @@ const game = (() => {
 
     const _gameScreenController = (() => {
         const mainTop = document.querySelector('.main-top>p');
-        const board = document.querySelector('.board');
+        const boardContainer = document.querySelector('.board');
         const playAgainButton = document.querySelector('#playAgainButton');
         const resetButton = document.querySelector('#resetButton');
         const player1Name = document.querySelector('#player1Name');
@@ -384,6 +540,7 @@ const game = (() => {
 
         const displayPlayAgain = () => {
             playAgainButton.classList.remove('visibility-hidden');
+            playAgainButton.addEventListener('click', playAgain, {once: true});
         }
 
         const displayPlayerNames = () => {
@@ -399,16 +556,16 @@ const game = (() => {
         const clickBoard = (e) => {            
             let row = '';
             let column = '';
-            
+
             if ((_activePlayer === _players[1]) && (_players[1].isAI)) {
                 row = e[0];
                 column = e[1];
             }
             else {
                 row = e.currentTarget.dataset.row;
-                column = e.currentTarget.dataset.column;
+                column = e.currentTarget.dataset.column;             
             }
-
+            
             if (playRound(row, column)) {
                 refreshScreen();
                 if (_gameOver) {
@@ -423,7 +580,7 @@ const game = (() => {
                     return;
                 }
                 if (_activePlayer.isAI) {
-                    clickBoard(_AIEasy.getChoice());
+                    clickBoard(_AI.getChoice());
                 }
                 animateClickedCell(row, column);
                 return
@@ -447,28 +604,28 @@ const game = (() => {
         }
 
         const clearBoard = () => {
-            while (board.firstChild) {board.removeChild(board.firstChild)};
+            while (boardContainer.firstChild) {boardContainer.removeChild(boardContainer.firstChild)};
         }
     
         const generateBoard = () => {
-            for (let i = 0; i < _gameBoard.getRowCount(); i++) {
-                for (let j = 0; j < _gameBoard.getColumnCount(); j++) {
+            for (let i = 0; i < _board.getRowCount(); i++) {
+                for (let j = 0; j < _board.getColumnCount(); j++) {
                     const button = document.createElement('button');
                     const span = document.createElement('span');
                     button.dataset.row = i;
                     button.dataset.column = j;
                     button.classList.add('cell');
-                    if ((_gameBoard.getBoard()[i][j].getValue() === '') && (!_gameOver)) {
+                    if ((_board.getBoard()[i][j].getValue() === '') && (!_gameOver)) {
                         _activePlayer.mark === 'o' ? button.classList.add('one') : button.classList.add('two');
                     }
-                    span.textContent = _gameBoard.getBoard()[i][j].getValue();
+                    span.textContent = _board.getBoard()[i][j].getValue();
                     if (!_activePlayer.isAI){
                         button.addEventListener('click', clickBoard);
                         button.classList.add('player');
                     }
 
                     button.appendChild(span);
-                    board.appendChild(button);
+                    boardContainer.appendChild(button);
                 }           
             }
         }
@@ -501,21 +658,21 @@ const game = (() => {
             refreshScreen();
             playAgainButton.classList.add('visibility-hidden');
             if (_activePlayer.isAI) {
-                clickBoard(_AIEasy.getChoice());
+                clickBoard(_AI.getChoice());
             }
         }
-        playAgainButton.addEventListener('click', playAgain);
 
         const refreshScreen = () => {
             displayActivePlayer();
             clearBoard();
             generateBoard();
             displayPlayerScores();
-            displayPlayerNames();           
+            displayPlayerNames();                
         }
         
         // Initialize for the first game
         refreshScreen();
+        
 
         return {
             clickBoard,
@@ -526,9 +683,14 @@ const game = (() => {
     return {
         playRound, // Can be removed later
         restartGame,
+        ENDSTATE,
+        ENDSTATEFATAL,
     }
 })();
 
 document
     .querySelector('#currentYear')
     .textContent = new Date().getFullYear();
+
+
+    
