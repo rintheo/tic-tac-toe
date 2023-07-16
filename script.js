@@ -59,32 +59,6 @@ const game = (() => {
 
     const _board = _gameBoard();
 
-
-    // temporary end state board =================================================
-    const ENDSTATE = () => {
-        _board.getBoard()[0][2].setValue('x');
-        _board.getBoard()[1][0].setValue('x');
-        _board.getBoard()[2][0].setValue('x');
-        _board.getBoard()[2][1].setValue('o');
-        _board.getBoard()[2][2].setValue('o');
-
-        //remember to put at [0][0] 'o' to initialize this end state
-    }
-
-    const ENDSTATEFATAL = () => {
-        _board.getBoard()[0][1].setValue('o');
-        _board.getBoard()[1][2].setValue('o');
-        _board.getBoard()[2][0].setValue('x');
-        _board.getBoard()[2][1].setValue('x');
-
-        //remember to put at [2][2] 'o' to initialize this end state
-    }
-
-    
-
-    // ============================================================================
-
-
     // Initialize the board for the first game
     _board.resetBoard();
 
@@ -141,24 +115,20 @@ const game = (() => {
         if (_board.getBoard()[row][column].getValue() !== '') return;
 
         _board.getBoard()[row][column].setValue(_activePlayer.mark);
-        // board.printBoard(); // For console version only
 
         // Return true for successful round
         if (_checkForWinner(_board)) {
             _gameOver = true;
             _winningPlayer.score += 1;
-            console.log(`Winner is ${_winningPlayer.name}!`);
             return true;
         }        
                 
         if (_checkForDraw(_board)) {
             _gameOver = true;
-            console.log('draw');
             return true;
         } 
 
         _switchActivePlayer();
-        // _printActivePlayer(); // for debugging
 
         return true;
     }
@@ -211,7 +181,6 @@ const game = (() => {
                 }
             }
         }
-        // console.log(_winningLine);
         return check;
     }
 
@@ -229,11 +198,8 @@ const game = (() => {
     }
 
     const _AI = (() => {
-        // let instanceBoard = _gameBoard();
-        
         const copyCurrentBoardState = (board) => {
             let copiedBoard = _gameBoard();
-            // instanceBoard.getBoard().splice(0, instanceBoard.getBoard().length);
             for (let i = 0; i < copiedBoard.getRowCount(); i++) {
                 copiedBoard.getBoard()[i] = [];
                 for (let j = 0; j < copiedBoard.getColumnCount(); j++) {
@@ -242,7 +208,7 @@ const game = (() => {
                     copiedBoard.getBoard()[i][j].setPosition(i, j);
                 }
             }
-            return copiedBoard
+            return copiedBoard;
         }
 
         const instanceStartingActivePlayer = _players[1];
@@ -265,17 +231,9 @@ const game = (() => {
                 minimaxRunning = true;
                 minimax(copyCurrentBoardState(_board), 0, instanceStartingActivePlayer);
                 minimaxRunning = false;
-                // console.log('minimaxChoices:')
-                // console.log(minimaxChoices)
-    
                 const sorted = minimaxChoices.sort((a, b) => b.score - a.score);
                 const filtered = sorted.filter(choice => sorted[0].score === choice.score);
-                // console.log(filtered);
-    
                 return filtered[~~(Math.random() * filtered.length)].position;
-                // call minimax(instanceBoard, 0)
-                // return minimax position value
-                // console.log(`RAN MINIMAX ${ranMinimax}`);
             }
             else if (_players[1].AIDifficulty === 'Easy') {
                 const possibleChoices = generatePossibleChoices(_board);
@@ -283,9 +241,6 @@ const game = (() => {
             }
         }
         
-        // for debugging
-        let ranMinimax = 0;
-
         let minimaxChoices = [];
         let minimaxRunning = false;
         const isMinimaxRunning = () => minimaxRunning;
@@ -293,84 +248,33 @@ const game = (() => {
         const minimax = (board, depth, activePlayer) => {
             let currentBoard = copyCurrentBoardState(board);
             let currentDepth = depth + 1; 
-            // let currentDepth = 0;
-
-            // for debugging
-            // console.log(`START MINIMAX | depth = ${currentDepth}`)    
-            // ranMinimax += 1;
-
             let currentPossibleChoices = generatePossibleChoices(currentBoard)
                                             .map(pos => {return {position: pos, score: 0}});
-
-            // console.log('current possible choices below');
-            // console.log(currentPossibleChoices);
-
             for (choice of currentPossibleChoices) {
                 const row = choice.position[0];
                 const column = choice.position[1];
                 let testBoard = copyCurrentBoardState(currentBoard);
-
-                // console.log(`FOR LOOP START | depth = ${currentDepth}`)
-                // console.log(`choice below: current player is ${activePlayer.name}`)
-                // console.log(`choice #${currentPossibleChoices.indexOf(choice) + 1}/${currentPossibleChoices.length}: ${choice.position}`);    
-                
                 testBoard.getBoard()[row][column].setValue(activePlayer.mark);
-                
-                // console.table(testBoard.printBoard());
-                
                 if (!_checkForWinner(testBoard)) {                  
                     if (_checkForDraw(testBoard)) {
-                        // console.log('draw');
                         choice.score = 0 + currentDepth; 
                     }
                     else {
-                        // console.log('no winner');
                         choice.score = minimax(testBoard, currentDepth, switchInstanceActivePlayer(activePlayer));
                     }
                 }
                 else {
-                    // console.log('yes winner');
                     choice.score = activePlayer === _players[0] ? -10 + currentDepth : 10 + currentDepth;
                 }  
                 testBoard.getBoard()[row][column].setValue('');
-                // console.log(`FOR LOOP END | depth = ${currentDepth}`)
             }
-
-            // console.log(`Current Possible Choices with Score: ${activePlayer.name}'s turn`);
-            // console.table(currentPossibleChoices);
-            // console.log(currentPossibleChoices.map(choice => choice.score));
-
-            // console.log('cloning:')
-            // console.log(currentPossibleChoices.slice())
             minimaxChoices = currentPossibleChoices.slice();
             if (activePlayer === _players[0]) {
-                // console.log(`returning minimum value: ${Math.min(...currentPossibleChoices.map(choice => choice.score))}`)
                 return Math.min(...currentPossibleChoices.map(choice => choice.score));
             }
             else {
-                // console.log(`returning maximum value: ${Math.max(...currentPossibleChoices.map(choice => choice.score))}`)
                 return Math.max(...currentPossibleChoices.map(choice => choice.score));
             }
-
-            console.log(`END MINIMAX | depth = ${currentDepth}`)    
-            
-            // current player (starts with AI) 
-            // list possible moves [{position, score}, ...] ***
-            // minimax depth +1
-            // loop through each possible moves (stop loop after last possible move), set new board
-                // if check win didnt return true, 
-                    // switch current player
-                    // current move = recurse^ *** (expected return value: {position, score})
-                // else if check win returns true
-                    // check winning player
-                    // AI wins, add score to position +10 + depth 
-                    // player wins, add score to position -10 + depth
-                // else if possible moves 0
-                    // draw score, add score to position 0 + depth
-            // if current player is AI
-                // return {position, score} with max score
-            // else if current player is player
-                // return {position, score} with minimum score                       
         }
 
         return {
@@ -378,8 +282,6 @@ const game = (() => {
             isMinimaxRunning,
         }
     })();
-
-    
 
     const _titleScreenController = (() => {
         const titleScreen = document.querySelector('.title-screen');
@@ -679,13 +581,6 @@ const game = (() => {
             resetGame,            
         }
     })();
-
-    return {
-        playRound, // Can be removed later
-        restartGame,
-        ENDSTATE,
-        ENDSTATEFATAL,
-    }
 })();
 
 document
